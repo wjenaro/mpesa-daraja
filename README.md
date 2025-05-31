@@ -9,27 +9,3 @@ Thank you for being part of this learning process.
 
 ---
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Setup Guide](#setup-guide)
-- [Configuration](#configuration)
-- [How It Works](#how-it-works)
-- [API Endpoint](#api-endpoint)
-- [Example Usage](#example-usage)
-- [Best Practices & Security](#best-practices--security)
-- [Troubleshooting/Common Errors](#troubleshootingcommon-errors)
-- [Further Reading](#further-reading)
-
----
-
-## Overview
-
-This Node.js application exposes a single endpoint to help you understand and interact with the M-Pesa Daraja API's OAuth service. The goal is to simplify learning the authentication process, including environment setup, code organization, and error handling.
-
-## Architecture
-
-*Coming soon... (This section will cover the high-level components and flow of the application, including how requests are handled and how authentication is managed.)*
-
----
