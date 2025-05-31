@@ -90,6 +90,163 @@ Input:  "key123:secret456"
 Output: "a2V5MTIzOnNlY3JldDQ1Ng=="
 ```
 
+## Detailed Base64 Authentication Process
+
+### Understanding the Authentication String Creation
+```javascript
+const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
+```
+
+This line of code is crucial for creating the authentication header required by the M-Pesa Daraja API. Let's break down the process step by step:
+
+### 1. Template Literal Creation
+```javascript
+`${consumerKey}:${consumerSecret}`
+```
+- Uses ES6 template literals (backticks)
+- Combines two values with a colon separator
+- Example: if `consumerKey="key123"` and `consumerSecret="secret456"`:
+  ```javascript
+  "key123:secret456"
+  ```
+
+### 2. Buffer Creation
+```javascript
+Buffer.from(string)
+```
+- Creates a new Buffer containing the string
+- Buffer is a Node.js class for handling binary data
+- Converts the string into a sequence of bytes
+- Example internal representation:
+  ```
+  <Buffer 6b 65 79 31 32 33 3a 73 65 63 72 65 74 34 35 36>
+  ```
+
+### 3. Base64 Encoding
+```javascript
+buffer.toString('base64')
+```
+- Converts the buffer to a base64-encoded string
+- Base64 uses 64 different ASCII characters:
+  - A-Z (26 characters)
+  - a-z (26 characters)
+  - 0-9 (10 characters)
+  - + and / (2 characters)
+
+### Visual Transformation Process
+```mermaid
+graph TD
+    A[Template Literal] -->|Combination| B[Raw String]
+    B -->|Buffer.from()| C[Binary Buffer]
+    C -->|toString('base64')| D[Base64 String]
+
+    subgraph "Example"
+    E["key123:secret456"] -->|Buffer.from()| F["<Buffer 6b 65 ...>"]
+    F -->|toString('base64')| G["a2V5MTIzOnNlY3JldDQ1Ng=="]
+    end
+```
+
+### Step-by-Step Example
+
+1. **Initial Values**:
+   ```javascript
+   consumerKey = "key123"
+   consumerSecret = "secret456"
+   ```
+
+2. **Template Literal**:
+   ```javascript
+   `${consumerKey}:${consumerSecret}` → "key123:secret456"
+   ```
+
+3. **Buffer Creation**:
+   ```javascript
+   Buffer.from("key123:secret456") → <Buffer 6b 65 79 31 32 33 3a 73 65 63 72 65 74 34 35 36>
+   ```
+
+4. **Base64 Encoding**:
+   ```javascript
+   buffer.toString('base64') → "a2V5MTIzOnNlY3JldDQ1Ng=="
+   ```
+
+### Why Base64?
+
+1. **HTTP Header Compatible**
+   - Base64 uses only printable ASCII characters
+   - Safe for HTTP headers
+   - No special character encoding issues
+
+2. **Standard Format**
+   - Widely used in authentication
+   - Part of HTTP Basic Authentication scheme
+   - Universal support across platforms
+
+3. **Reversible Encoding**
+   - Not encryption (can be decoded)
+   - Used for transport, not security
+   - Security comes from HTTPS transport
+
+### Usage in HTTP Headers
+
+```http
+GET /oauth/v1/generate HTTP/1.1
+Host: sandbox.safaricom.co.ke
+Authorization: Basic a2V5MTIzOnNlY3JldDQ1Ng==
+```
+
+### Security Notes
+
+1. **Transport Security**
+   - Always use HTTPS
+   - Base64 is encoding, not encryption
+   - Anyone can decode base64 strings
+
+2. **Credential Protection**
+   ```javascript
+   // DON'T do this
+   console.log(auth); // Never log the auth string
+
+   // DO this
+   console.log('Auth header created successfully');
+   ```
+
+3. **Error Prevention**
+   ```javascript
+   // Add validation
+   if (!consumerKey || !consumerSecret) {
+       throw new Error('Missing required credentials');
+   }
+   ```
+
+### Common Issues and Solutions
+
+1. **Missing Credentials**
+   ```javascript
+   // Problem
+   const auth = Buffer.from(':').toString('base64');  // Empty credentials
+
+   // Solution
+   if (!consumerKey || !consumerSecret) {
+       throw new Error('Missing credentials');
+   }
+   ```
+
+2. **Invalid Characters**
+   ```javascript
+   // Problem
+   consumerKey = "key with spaces";  // Spaces in key
+
+   // Solution
+   const sanitizedKey = consumerKey.trim();  // Remove whitespace
+   ```
+
+3. **Buffer Memory**
+   ```javascript
+   // Best Practice
+   const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
+   // Buffer is automatically garbage collected
+   ```
+
 ### 4. Token Generation Function
 ```javascript
 const getAccessToken = async () => {
